@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+<meta charset="UTF-8">
+<title>Liste Fornitori</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+padding:20px;
+}
+
+.lista{
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:8px;
+}
+
+.elemento{
+display:flex;
+align-items:center;
+background:#eee;
+padding:8px;
+margin:5px 0;
+border-radius:6px;
+}
+
+.ordinare{
+background:#ffd27f;
+}
+
+.nome{
+flex:1;
+margin-left:10px;
+}
+
+button{
+margin-left:5px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>Liste Fornitori</h2>
+
+<input id="nomeLista" placeholder="Nuova lista" onkeydown="if(event.key==='Enter') aggiungiLista()">
+<button onclick="aggiungiLista()">Crea lista</button>
+
+<div id="contenitore"></div>
+
+<script>
+
+let liste = JSON.parse(localStorage.getItem("listeFornitori")) || [];
+
+function salva(){
+localStorage.setItem("listeFornitori", JSON.stringify(liste));
+}
+
+function render(){
+
+let contenitore=document.getElementById("contenitore");
+contenitore.innerHTML="";
+
+liste.forEach((lista,i)=>{
+
+let div=document.createElement("div");
+div.className="lista";
+
+div.innerHTML=`
+<h3>${lista.nome}</h3>
+
+<input id="input${i}" placeholder="Nuovo elemento" 
+onkeydown="if(event.key==='Enter') aggiungiElemento(${i})">
+
+<button onclick="aggiungiElemento(${i})">Aggiungi</button>
+
+<button onclick="ordina(${i})">Ordina A-Z</button>
+<button onclick="deselezionaTutto(${i})">Deseleziona tutto</button>
+<button onclick="modLista(${i})">Modifica</button>
+<button onclick="delLista(${i})">Elimina</button>
+
+<div id="elementi${i}"></div>
+`;
+
+contenitore.appendChild(div);
+
+let box=document.getElementById("elementi"+i);
+
+lista.elementi.forEach((el,j)=>{
+
+let riga=document.createElement("div");
+riga.className="elemento"+(el.check?" ordinare":"");
+
+riga.innerHTML=`
+
+<input type="checkbox" ${el.check?"checked":""} onclick="toggle(${i},${j})">
+
+<div class="nome">${el.nome}</div>
+
+<button onclick="modEl(${i},${j})">✏️</button>
+
+<button onclick="delEl(${i},${j})">🗑️</button>
+
+`;
+
+box.appendChild(riga);
+
+});
+
+});
+
+salva();
+
+}
+
+function aggiungiLista(){
+
+let nome=document.getElementById("nomeLista").value;
+
+if(!nome) return;
+
+liste.push({
+nome:nome,
+elementi:[]
+});
+
+document.getElementById("nomeLista").value="";
+
+render();
+
+}
+
+function delLista(i){
+
+if(confirm("Eliminare lista?")){
+liste.splice(i,1);
+render();
+}
+
+}
+
+function modLista(i){
+
+let nuovo=prompt("Nuovo nome",liste[i].nome);
+
+if(nuovo){
+liste[i].nome=nuovo;
+render();
+}
+
+}
+
+function aggiungiElemento(i){
+
+let input=document.getElementById("input"+i);
+
+if(!input.value) return;
+
+liste[i].elementi.push({
+nome:input.value,
+check:false
+});
+
+input.value="";
+
+render();
+
+}
+
+function toggle(i,j){
+
+liste[i].elementi[j].check=!liste[i].elementi[j].check;
+
+render();
+
+}
+
+function delEl(i,j){
+
+if(confirm("Eliminare elemento?")){
+liste[i].elementi.splice(j,1);
+render();
+}
+
+}
+
+function modEl(i,j){
+
+let nuovo=prompt("Modifica elemento",liste[i].elementi[j].nome);
+
+if(nuovo){
+liste[i].elementi[j].nome=nuovo;
+render();
+}
+
+}
+
+function ordina(i){
+
+liste[i].elementi.sort((a,b)=>a.nome.localeCompare(b.nome));
+
+render();
+
+}
+
+render();
+
+function deselezionaTutto(i){
+
+liste[i].elementi.forEach(el => {
+el.check = false
+})
+
+render()
+
+}
+</script>
+
+</body>
+</html>
