@@ -9,12 +9,12 @@
 
 body{
 font-family:Arial;
-background:#fdfdd4;
+background:#f2f2f2;
 padding:20px;
 }
 
 .lista{
-background:rgb(190, 174, 250);
+background:white;
 padding:15px;
 margin-bottom:20px;
 border-radius:8px;
@@ -23,14 +23,14 @@ border-radius:8px;
 .elemento{
 display:flex;
 align-items:center;
-background:#f6f8eb;
+background:#eee;
 padding:8px;
 margin:5px 0;
 border-radius:6px;
 }
 
 .ordinare{
-background:#f3690c;
+background:#ffd27f;
 }
 
 .nome{
@@ -40,6 +40,7 @@ margin-left:10px;
 
 button{
 margin-left:5px;
+cursor:pointer;
 }
 
 </style>
@@ -49,7 +50,7 @@ margin-left:5px;
 
 <h2>Liste Fornitori</h2>
 
-<input id="nomeLista" placeholder="Nuova lista">
+<input id="nomeLista" placeholder="Nuova lista" onkeydown="if(event.key==='Enter') aggiungiLista()">
 <button onclick="aggiungiLista()">Crea lista</button>
 
 <div id="contenitore"></div>
@@ -75,11 +76,13 @@ div.className="lista";
 div.innerHTML=`
 <h3>${lista.nome}</h3>
 
-<input id="input${i}" placeholder="Nuovo elemento">
+<input id="input${i}" placeholder="Nuovo elemento" 
+onkeydown="if(event.key==='Enter') aggiungiElemento(${i})">
+
 <button onclick="aggiungiElemento(${i})">Aggiungi</button>
 
 <button onclick="ordina(${i})">Ordina A-Z</button>
-
+<button onclick="deselezionaTutto(${i})">Deseleziona tutto</button>
 <button onclick="modLista(${i})">Modifica</button>
 <button onclick="delLista(${i})">Elimina</button>
 
@@ -101,8 +104,9 @@ riga.innerHTML=`
 
 <div class="nome">${el.nome}</div>
 
-<button onclick="modEl(${i},${j})">✏</button>
-<button onclick="delEl(${i},${j})">❌</button>
+<button onclick="modEl(${i},${j})">✏️</button>
+
+<button onclick="delEl(${i},${j})">🗑️</button>
 
 `;
 
@@ -180,9 +184,10 @@ render();
 
 function delEl(i,j){
 
+if(confirm("Eliminare elemento?")){
 liste[i].elementi.splice(j,1);
-
 render();
+}
 
 }
 
@@ -207,6 +212,15 @@ render();
 
 render();
 
+function deselezionaTutto(i){
+
+liste[i].elementi.forEach(el => {
+el.check = false
+})
+
+render()
+
+}
 </script>
 
 </body>
