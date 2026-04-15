@@ -44,7 +44,14 @@ button{
 margin-left:5px;
 cursor:pointer;
 }
+  
+.lista{
+cursor:grab;
+}
 
+.lista:active{
+cursor:grabbing;
+}
 </style>
 </head>
 
@@ -237,6 +244,19 @@ function deselezionaTutto(i){
 liste[i].elementi.forEach(el => {
 el.check = false
 })
+
+render()
+
+}
+
+  function spostaLista(from,to){
+
+from = parseInt(from)
+
+if(from === to) return
+
+let item = liste.splice(from,1)[0]
+liste.splice(to,0,item)
 
 render()
 
