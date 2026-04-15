@@ -2,13 +2,83 @@
 <html lang="it">
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <title>Liste Fornitori</title>
 
 <style>
+body{
+font-family:Arial;
+background:#f2f2f2;
+margin:0;
+padding:10px;
+}
 
+h2{
+text-align:center;
+font-size:22px;
+}
+
+input{
+width:100%;
+padding:14px;
+font-size:16px;
+margin:6px 0;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:14px;
+margin:5px 0;
+font-size:16px;
+border:none;
+border-radius:8px;
+background:#333;
+color:white;
+}
+
+.lista{
+background:white;
+padding:12px;
+margin-bottom:15px;
+border-radius:12px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.lista h3{
+font-size:18px;
+margin:5px 0 10px 0;
+}
+
+.elemento{
+display:flex;
+align-items:center;
+padding:12px;
+margin:6px 0;
+border-radius:8px;
+background:#eee;
+font-size:16px;
+}
+
+.elemento input[type="checkbox"]{
+transform:scale(1.5);
+margin-right:10px;
+}
+
+.elemento .nome{
+flex:1;
+}
+
+.elemento button{
+width:auto;
+padding:8px 10px;
+font-size:14px;
+margin-left:5px;
+}
+  
 body{
 font-family:Arial;
 background:#f2f2f2;
@@ -52,6 +122,11 @@ cursor:grab;
 .lista:active{
 cursor:grabbing;
 }
+
+  *{
+-webkit-tap-highlight-color: transparent;
+}
+  
 </style>
 </head>
 
