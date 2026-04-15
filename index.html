@@ -2,110 +2,46 @@
 <html lang="it">
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <title>Liste Fornitori</title>
 
 <style>
+
 body{
 font-family:Arial;
-background:#f2f2f2;
-margin:0;
-padding:10px;
-}
-
-h2{
-text-align:center;
-font-size:22px;
-}
-
-input{
-width:100%;
-padding:14px;
-font-size:16px;
-margin:6px 0;
-box-sizing:border-box;
-}
-
-button{
-width:100%;
-padding:14px;
-margin:5px 0;
-font-size:16px;
-border:none;
-border-radius:8px;
-background:#333;
-color:white;
+background:#fdfdd4;
+padding:20px;
 }
 
 .lista{
-background:#483D8B;
-padding:12px;
-margin-bottom:15px;
-border-radius:12px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
-.lista h3{
-font-size:18px;
-margin:5px 0 10px 0;
+background:rgb(190, 174, 250);
+padding:15px;
+margin-bottom:20px;
+border-radius:8px;
 }
 
 .elemento{
 display:flex;
 align-items:center;
-justify-content:space-between;
-padding:10px;
-margin:6px 0;
-border-radius:10px;
-background:#eee;
-gap:10px;
+background:#f6f8eb;
+padding:8px;
+margin:5px 0;
+border-radius:6px;
 }
 
-/* SINISTRA: nome grande */
-.elemento .nome{
+.ordinare{
+background:#f3690c;
+}
+
+.nome{
 flex:1;
-font-size:20px;   /* 🔥 più grande */
-font-weight:500;
+margin-left:10px;
 }
 
-/* CHECKBOX a destra del nome */
-.elemento input[type="checkbox"]{
-transform:scale(1.4);
-margin:0 10px;
+button{
+margin-left:5px;
 }
 
-/* BOTTONI a destra */
-.elemento button{
-padding:6px 8px;
-font-size:13px;
-width:auto;
-margin-left:4px;
-}
-
-/* COMPATTEZZA generale */
-.lista{
-padding:10px;
-}
-
-input{
-padding:12px;
-font-size:16px;
-}
-.lista{
-cursor:grab;
-}
-
-.lista:active{
-cursor:grabbing;
-}
-
-  *{
--webkit-tap-highlight-color: transparent;
-}
-  
 </style>
 </head>
 
@@ -113,7 +49,7 @@ cursor:grabbing;
 
 <h2>Liste Fornitori</h2>
 
-<input id="nomeLista" placeholder="Nuova lista" onkeydown="if(event.key==='Enter') aggiungiLista()">
+<input id="nomeLista" placeholder="Nuova lista">
 <button onclick="aggiungiLista()">Crea lista</button>
 
 <div id="contenitore"></div>
@@ -133,37 +69,17 @@ contenitore.innerHTML="";
 
 liste.forEach((lista,i)=>{
 
-let div=document.createElement("div")
-div.className="lista"
-div.draggable=true
-
-div.ondragstart=(e)=>{
-e.dataTransfer.setData("text/plain", i)
-}
-
-div.ondragover=(e)=>{
-e.preventDefault()
-}
-
-div.ondrop=(e)=>{
-e.preventDefault()
-
-let from = e.dataTransfer.getData("text/plain")
-let to = i
-
-spostaLista(from,to)
-}
+let div=document.createElement("div");
+div.className="lista";
 
 div.innerHTML=`
 <h3>${lista.nome}</h3>
 
-<input id="input${i}" placeholder="Nuovo elemento" 
-onkeydown="if(event.key==='Enter') aggiungiElemento(${i})">
-
+<input id="input${i}" placeholder="Nuovo elemento">
 <button onclick="aggiungiElemento(${i})">Aggiungi</button>
 
 <button onclick="ordina(${i})">Ordina A-Z</button>
-<button onclick="deselezionaTutto(${i})">Deseleziona tutto</button>
+
 <button onclick="modLista(${i})">Modifica</button>
 <button onclick="delLista(${i})">Elimina</button>
 
@@ -181,21 +97,12 @@ riga.className="elemento"+(el.check?" ordinare":"");
 
 riga.innerHTML=`
 
-<div class="nome">${el.nome}</div>
-
-<input type="checkbox" ${el.check?"checked":""}
-onclick="toggle(${i},${j})">
-
-<button onclick="modEl(${i},${j})">✏️</button>
-<button onclick="delEl(${i},${j})">🗑️</button>
-`;
 <input type="checkbox" ${el.check?"checked":""} onclick="toggle(${i},${j})">
 
 <div class="nome">${el.nome}</div>
 
-<button onclick="modEl(${i},${j})">✏️</button>
-
-<button onclick="delEl(${i},${j})">🗑️</button>
+<button onclick="modEl(${i},${j})">✏</button>
+<button onclick="delEl(${i},${j})">❌</button>
 
 `;
 
@@ -273,10 +180,9 @@ render();
 
 function delEl(i,j){
 
-if(confirm("Eliminare elemento?")){
 liste[i].elementi.splice(j,1);
+
 render();
-}
 
 }
 
@@ -301,33 +207,7 @@ render();
 
 render();
 
-function deselezionaTutto(i){
-
-liste[i].elementi.forEach(el => {
-el.check = false
-})
-
-render()
-
-}
-
-  function spostaLista(from,to){
-
-from = parseInt(from)
-
-if(from === to) return
-
-let item = liste.splice(from,1)[0]
-liste.splice(to,0,item)
-
-render()
-
-}
 </script>
-<script>
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("sw.js")
-}
-</script>
+
 </body>
 </html>
