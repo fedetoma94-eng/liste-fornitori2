@@ -56,29 +56,44 @@ margin:5px 0 10px 0;
 .elemento{
 display:flex;
 align-items:center;
-padding:12px;
+justify-content:space-between;
+padding:10px;
 margin:6px 0;
-border-radius:8px;
+border-radius:10px;
 background:#eee;
-font-size:16px;
+gap:10px;
 }
 
-.elemento input[type="checkbox"]{
-transform:scale(1.5);
-margin-left:10px;
-}
-
+/* SINISTRA: nome grande */
 .elemento .nome{
 flex:1;
+font-size:20px;   /* 🔥 più grande */
+font-weight:500;
 }
 
-.elemento button{
-width:auto;
-padding:8px 10px;
-font-size:14px;
-margin-left:5px;
+/* CHECKBOX a destra del nome */
+.elemento input[type="checkbox"]{
+transform:scale(1.4);
+margin:0 10px;
 }
-  
+
+/* BOTTONI a destra */
+.elemento button{
+padding:6px 8px;
+font-size:13px;
+width:auto;
+margin-left:4px;
+}
+
+/* COMPATTEZZA generale */
+.lista{
+padding:10px;
+}
+
+input{
+padding:12px;
+font-size:16px;
+}
 .lista{
 cursor:grab;
 }
@@ -166,6 +181,14 @@ riga.className="elemento"+(el.check?" ordinare":"");
 
 riga.innerHTML=`
 
+<div class="nome">${el.nome}</div>
+
+<input type="checkbox" ${el.check?"checked":""}
+onclick="toggle(${i},${j})">
+
+<button onclick="modEl(${i},${j})">✏️</button>
+<button onclick="delEl(${i},${j})">🗑️</button>
+`;
 <input type="checkbox" ${el.check?"checked":""} onclick="toggle(${i},${j})">
 
 <div class="nome">${el.nome}</div>
