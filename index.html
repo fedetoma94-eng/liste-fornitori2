@@ -72,8 +72,26 @@ contenitore.innerHTML="";
 
 liste.forEach((lista,i)=>{
 
-let div=document.createElement("div");
-div.className="lista";
+let div=document.createElement("div")
+div.className="lista"
+div.draggable=true
+
+div.ondragstart=(e)=>{
+e.dataTransfer.setData("text/plain", i)
+}
+
+div.ondragover=(e)=>{
+e.preventDefault()
+}
+
+div.ondrop=(e)=>{
+e.preventDefault()
+
+let from = e.dataTransfer.getData("text/plain")
+let to = i
+
+spostaLista(from,to)
+}
 
 div.innerHTML=`
 <h3>${lista.nome}</h3>
