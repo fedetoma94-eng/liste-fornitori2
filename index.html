@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -34,12 +34,13 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-main);
     color: var(--text-main);
+    font-size: 18px;
   }
 
   .pagina {
-    width: min(980px, calc(100% - 32px));
+    width: min(1100px, calc(100% - 24px));
     margin: 0 auto;
-    padding: 32px 0 40px;
+    padding: 28px 0 44px;
   }
 
   .intestazione {
@@ -48,14 +49,15 @@
 
   .intestazione h1 {
     margin: 0 0 8px;
-    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-size: clamp(2.3rem, 5vw, 3.4rem);
     letter-spacing: -0.03em;
   }
 
   .intestazione p {
     margin: 0;
     color: var(--text-soft);
-    font-size: 1rem;
+    font-size: 1.08rem;
+    line-height: 1.55;
   }
 
   .crea-lista,
@@ -69,9 +71,16 @@
   .crea-lista {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
-    padding: 18px;
+    gap: 14px;
+    padding: 22px;
     margin-bottom: 24px;
+  }
+
+  .strumenti {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
   }
 
   .liste-vuote {
@@ -101,18 +110,22 @@
     gap: 16px;
     padding: 20px 20px 12px;
     border-bottom: 1px solid rgba(214, 224, 232, 0.7);
-    background: linear-gradient(180deg, var(--list-color-soft, rgba(31, 111, 139, 0.12)) 0%, rgba(255, 255, 255, 0.95) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--list-color-soft, rgba(31, 111, 139, 0.12)) 0%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
   }
 
   .lista-header h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.42rem;
   }
 
   .lista-meta {
     margin-top: 4px;
     color: var(--text-soft);
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .lista-azioni,
@@ -188,18 +201,18 @@
   }
 
   .lista-contenuto {
-    padding: 16px 20px 20px;
+    padding: 18px 22px 22px;
   }
 
   .aggiungi-elemento {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 14px;
+    margin-bottom: 16px;
   }
 
   .azioni-secondarie {
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .lista-elementi {
@@ -209,18 +222,19 @@
 
   .messaggio-vuoto {
     margin: 0;
-    padding: 16px;
+    padding: 18px;
     border-radius: var(--radius-md);
     background: var(--bg-soft);
     color: var(--text-soft);
     text-align: center;
+    font-size: 1rem;
   }
 
   .elemento {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: var(--bg-item);
     border: 1px solid transparent;
     border-radius: var(--radius-md);
@@ -306,7 +320,8 @@
 
   .input-testo {
     width: 100%;
-    padding: 12px 14px;
+    min-height: 52px;
+    padding: 14px 16px;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: #fff;
@@ -324,7 +339,8 @@
   .bottone {
     border: 0;
     border-radius: 999px;
-    padding: 10px 14px;
+    min-height: 50px;
+    padding: 12px 18px;
     font: inherit;
     font-weight: 600;
     cursor: pointer;
@@ -378,7 +394,7 @@
     min-height: 24px;
     margin: 14px 0 0;
     color: var(--primary-hover);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
   }
 
@@ -436,8 +452,8 @@
 
   @media (max-width: 720px) {
     .pagina {
-      width: min(100% - 20px, 980px);
-      padding-top: 20px;
+      width: min(100% - 14px, 1100px);
+      padding-top: 14px;
     }
 
     .crea-lista,
@@ -459,7 +475,8 @@
     }
 
     .lista-azioni .bottone,
-    .azioni-secondarie .bottone {
+    .azioni-secondarie .bottone,
+    .strumenti .bottone {
       flex: 1 1 auto;
     }
 
@@ -470,6 +487,17 @@
     .dialogo-azioni .bottone {
       flex: 1 1 auto;
     }
+
+    body {
+      font-size: 19px;
+    }
+
+    .lista-header,
+    .lista-contenuto,
+    .crea-lista {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
   }
 </style>
 </head>
@@ -477,8 +505,14 @@
   <main class="pagina">
     <header class="intestazione">
       <h1>Liste Fornitori</h1>
-      <p>Gestisci piu liste, spunta cio che hai gia controllato e tieni tutto salvato nel browser.</p>
+      <p>Gestisci piu liste, spunta cio che hai gia controllato, cambia colori e salva tutto nel browser.</p>
     </header>
+
+    <section class="strumenti" aria-label="Strumenti di trasferimento">
+      <button id="esportaBtn" class="bottone bottone-secondario" type="button">Esporta liste</button>
+      <button id="importaBtn" class="bottone bottone-secondario" type="button">Importa liste</button>
+      <input id="importaFile" type="file" accept="application/json,.json" hidden>
+    </section>
 
     <section class="crea-lista" aria-label="Crea una nuova lista">
       <label class="sr-only" for="nomeLista">Nome della nuova lista</label>
@@ -528,6 +562,9 @@
 
   const nomeListaInput = document.getElementById("nomeLista");
   const creaListaBtn = document.getElementById("creaListaBtn");
+  const esportaBtn = document.getElementById("esportaBtn");
+  const importaBtn = document.getElementById("importaBtn");
+  const importaFile = document.getElementById("importaFile");
   const contenitore = document.getElementById("contenitore");
   const messaggioStato = document.getElementById("messaggioStato");
   const dialogoAzione = document.getElementById("dialogoAzione");
@@ -539,6 +576,10 @@
   const dialogoAnnulla = document.getElementById("dialogoAnnulla");
 
   creaListaBtn.addEventListener("click", aggiungiLista);
+  esportaBtn.addEventListener("click", esportaListe);
+  importaBtn.addEventListener("click", () => importaFile.click());
+  importaFile.addEventListener("change", importaListe);
+
   nomeListaInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       aggiungiLista();
@@ -632,6 +673,11 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stato.liste));
   }
 
+  function generaNomeExport() {
+    const oggi = new Date().toISOString().slice(0, 10);
+    return `liste-fornitori-${oggi}.json`;
+  }
+
   function mostraMessaggio(testo = "") {
     messaggioStato.textContent = testo;
     if (!testo) {
@@ -649,10 +695,12 @@
     bottone.type = "button";
     bottone.className = classi;
     bottone.textContent = testo;
+
     if (label) {
       bottone.setAttribute("aria-label", label);
       bottone.title = label;
     }
+
     bottone.addEventListener("click", onClick);
     return bottone;
   }
@@ -680,6 +728,7 @@
       };
 
       const onCancel = () => chiudi(false);
+
       const onCancelDialog = (event) => {
         event.preventDefault();
         chiudi(false);
@@ -722,6 +771,7 @@
       };
 
       const onCancel = () => chiudi(null);
+
       const onCancelDialog = (event) => {
         event.preventDefault();
         chiudi(null);
@@ -829,6 +879,7 @@
     inputElemento.autocomplete = "off";
     inputElemento.maxLength = 120;
     inputElemento.setAttribute("aria-label", `Nuovo elemento per la lista ${lista.nome}`);
+
     inputElemento.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         aggiungiElemento(indiceLista, inputElemento);
@@ -847,16 +898,8 @@
     azioniSecondarie.className = "azioni-secondarie";
     azioniSecondarie.append(
       creaBottone("Ordina A-Z", "bottone bottone-secondario", () => ordina(indiceLista)),
-      creaBottone(
-        "Copia selezionati",
-        "bottone bottone-secondario",
-        () => copiaSelezionati(indiceLista)
-      ),
-      creaBottone(
-        "Deseleziona tutto",
-        "bottone bottone-secondario",
-        () => deselezionaTutto(indiceLista)
-      )
+      creaBottone("Copia selezionati", "bottone bottone-secondario", () => copiaSelezionati(indiceLista)),
+      creaBottone("Deseleziona tutto", "bottone bottone-secondario", () => deselezionaTutto(indiceLista))
     );
 
     const listaElementi = document.createElement("div");
@@ -959,12 +1002,14 @@
       if (indiceElemento === indiceElementoDaIgnorare) {
         return false;
       }
+
       return elemento.nome.localeCompare(nome, "it", { sensitivity: "base" }) === 0;
     });
   }
 
   function aggiungiLista() {
     const nome = nomeListaInput.value.trim();
+
     if (!nome) {
       mostraMessaggio("Inserisci un nome valido per la lista.");
       nomeListaInput.focus();
@@ -985,6 +1030,69 @@
     mostraMessaggio(`Lista "${nome}" creata.`);
   }
 
+  function esportaListe() {
+    if (stato.liste.length === 0) {
+      mostraMessaggio("Non ci sono liste da esportare.");
+      return;
+    }
+
+    const contenuto = JSON.stringify(stato.liste, null, 2);
+    const blob = new Blob([contenuto], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = generaNomeExport();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    mostraMessaggio("File JSON esportato con successo.");
+  }
+
+  async function importaListe(event) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const testo = await file.text();
+      const dati = JSON.parse(testo);
+      const listeImportate = Array.isArray(dati)
+        ? dati.map((lista, indice) => normalizzaLista(lista, indice)).filter(Boolean)
+        : [];
+
+      if (listeImportate.length === 0) {
+        mostraMessaggio("Il file non contiene liste valide.");
+        importaFile.value = "";
+        return;
+      }
+
+      const confermato = await apriDialogoConferma({
+        titolo: "Importa liste",
+        testo: `Vuoi sostituire le liste attuali con ${listeImportate.length} liste importate?`,
+        confermaLabel: "Importa"
+      });
+
+      if (!confermato) {
+        importaFile.value = "";
+        return;
+      }
+
+      stato.liste = listeImportate;
+      salva();
+      render();
+      mostraMessaggio(`${listeImportate.length} liste importate con successo.`);
+    } catch {
+      mostraMessaggio("Non sono riuscito a leggere il file JSON.");
+    } finally {
+      importaFile.value = "";
+    }
+  }
+
   function aggiornaColoreLista(indiceLista, colore) {
     stato.liste[indiceLista].colore = normalizzaColore(colore, stato.liste[indiceLista].colore);
     salva();
@@ -993,6 +1101,7 @@
 
   function avviaTrascinamentoLista(event, indiceLista) {
     stato.dragIndice = indiceLista;
+
     const scheda = event.currentTarget.closest(".lista");
     if (scheda) {
       scheda.classList.add("trascinata");
@@ -1008,6 +1117,7 @@
     }
 
     event.preventDefault();
+
     const sezione = event.currentTarget;
     const rettangolo = sezione.getBoundingClientRect();
     const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
@@ -1017,6 +1127,7 @@
     });
 
     sezione.classList.add(posizione === "before" ? "drag-over-before" : "drag-over-after");
+
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = "move";
     }
@@ -1028,6 +1139,7 @@
     }
 
     event.preventDefault();
+
     const rettangolo = event.currentTarget.getBoundingClientRect();
     const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
     spostaLista(stato.dragIndice, indiceLista, posizione);
@@ -1060,6 +1172,7 @@
 
   function fineTrascinamentoLista() {
     stato.dragIndice = null;
+
     contenitore.querySelectorAll(".lista").forEach((listaElemento) => {
       listaElemento.classList.remove("trascinata", "drag-over-before", "drag-over-after");
     });
@@ -1067,6 +1180,7 @@
 
   function avviaTrascinamentoElemento(event, indiceLista, indiceElemento) {
     stato.dragElemento = { indiceLista, indiceElemento };
+
     const riga = event.currentTarget.closest(".elemento");
     if (riga) {
       riga.classList.add("trascinato");
@@ -1082,12 +1196,14 @@
     }
 
     event.preventDefault();
+
     const riga = event.currentTarget;
     const rettangolo = riga.getBoundingClientRect();
     const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
 
     pulisciIndicatoriElementi();
     riga.classList.add(posizione === "before" ? "drag-over-before" : "drag-over-after");
+
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = "move";
     }
@@ -1099,6 +1215,7 @@
     }
 
     event.preventDefault();
+
     const riga = event.currentTarget;
     const rettangolo = riga.getBoundingClientRect();
     const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
@@ -1111,6 +1228,7 @@
     }
 
     event.preventDefault();
+
     if (event.dataTransfer) {
       event.dataTransfer.dropEffect = "move";
     }
@@ -1126,11 +1244,17 @@
     }
 
     event.preventDefault();
-    spostaElemento(indiceLista, stato.dragElemento.indiceElemento, stato.liste[indiceLista].elementi.length - 1, "after");
+    spostaElemento(
+      indiceLista,
+      stato.dragElemento.indiceElemento,
+      stato.liste[indiceLista].elementi.length - 1,
+      "after"
+    );
   }
 
   function spostaElemento(indiceLista, indicePartenza, indiceDestinazione, posizione) {
     const elementi = stato.liste[indiceLista].elementi;
+
     if (!Array.isArray(elementi) || elementi.length <= 1) {
       fineTrascinamentoElemento();
       return;
@@ -1217,6 +1341,7 @@
 
   function aggiungiElemento(indiceLista, inputElemento) {
     const nome = inputElemento.value.trim();
+
     if (!nome) {
       mostraMessaggio("Inserisci un nome valido per l'elemento.");
       inputElemento.focus();
@@ -1241,6 +1366,7 @@
 
     const schede = contenitore.querySelectorAll(".lista");
     const inputAggiornato = schede[indiceLista]?.querySelector(".input-testo");
+
     if (inputAggiornato) {
       inputAggiornato.focus();
     }
@@ -1306,6 +1432,7 @@
     stato.liste[indiceLista].elementi.sort((a, b) =>
       a.nome.localeCompare(b.nome, "it", { sensitivity: "base" })
     );
+
     salva();
     render();
     mostraMessaggio("Elementi ordinati da A a Z.");
@@ -1346,6 +1473,7 @@
 
   function deselezionaTutto(indiceLista) {
     const elementi = stato.liste[indiceLista].elementi;
+
     if (elementi.length === 0) {
       mostraMessaggio("Non ci sono elementi da deselezionare.");
       return;
