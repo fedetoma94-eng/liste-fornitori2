@@ -1,227 +1,1366 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="it">
-
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Liste Fornitori</title>
-
 <style>
+  :root {
+    --bg-main: linear-gradient(180deg, #eef4f8 0%, #dfe9f1 100%);
+    --bg-card: #ffffff;
+    --bg-soft: #f7fafc;
+    --bg-item: #eef3f7;
+    --bg-item-checked: #ffe2a8;
+    --border: #d6e0e8;
+    --text-main: #203040;
+    --text-soft: #5a6b7b;
+    --primary: #1f6f8b;
+    --primary-hover: #195b72;
+    --danger: #b9473f;
+    --danger-hover: #973830;
+    --shadow: 0 14px 32px rgba(32, 48, 64, 0.10);
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 10px;
+  }
 
-body{
-font-family:Arial;
-background:#f2f2f2;
-padding:20px;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-.lista{
-background:white;
-padding:15px;
-margin-bottom:20px;
-border-radius:8px;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+  }
 
-.elemento{
-display:flex;
-align-items:center;
-background:#eee;
-padding:8px;
-margin:5px 0;
-border-radius:6px;
-}
+  .pagina {
+    width: min(980px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0 40px;
+  }
 
-.ordinare{
-background:#ffd27f;
-}
+  .intestazione {
+    margin-bottom: 24px;
+  }
 
-.nome{
-flex:1;
-margin-left:10px;
-}
+  .intestazione h1 {
+    margin: 0 0 8px;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    letter-spacing: -0.03em;
+  }
 
-button{
-margin-left:5px;
-cursor:pointer;
-}
+  .intestazione p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 1rem;
+  }
 
+  .crea-lista,
+  .lista {
+    background: var(--bg-card);
+    border: 1px solid rgba(214, 224, 232, 0.8);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+
+  .crea-lista {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 18px;
+    margin-bottom: 24px;
+  }
+
+  .liste-vuote {
+    padding: 28px;
+    text-align: center;
+    color: var(--text-soft);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .griglia-liste {
+    display: grid;
+    gap: 18px;
+  }
+
+  .lista {
+    overflow: hidden;
+    border-top: 5px solid var(--list-color, var(--primary));
+    transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+  }
+
+  .lista-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 16px;
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid rgba(214, 224, 232, 0.7);
+    background: linear-gradient(180deg, var(--list-color-soft, rgba(31, 111, 139, 0.12)) 0%, rgba(255, 255, 255, 0.95) 100%);
+  }
+
+  .lista-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .lista-meta {
+    margin-top: 4px;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+
+  .lista-azioni,
+  .azioni-secondarie,
+  .azioni-elemento {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .lista-controlli {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .controllo-colore {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(214, 224, 232, 0.95);
+    color: var(--text-soft);
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .input-colore {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .maniglia-drag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px dashed rgba(32, 48, 64, 0.2);
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--text-soft);
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .maniglia-drag:active {
+    cursor: grabbing;
+  }
+
+  .lista.trascinata {
+    opacity: 0.72;
+    transform: scale(0.99);
+    box-shadow: 0 18px 36px rgba(32, 48, 64, 0.16);
+  }
+
+  .lista.drag-over-before {
+    box-shadow: inset 0 5px 0 var(--list-color, var(--primary)), var(--shadow);
+  }
+
+  .lista.drag-over-after {
+    box-shadow: inset 0 -5px 0 var(--list-color, var(--primary)), var(--shadow);
+  }
+
+  .lista-contenuto {
+    padding: 16px 20px 20px;
+  }
+
+  .aggiungi-elemento {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .azioni-secondarie {
+    margin-bottom: 14px;
+  }
+
+  .lista-elementi {
+    display: grid;
+    gap: 10px;
+  }
+
+  .messaggio-vuoto {
+    margin: 0;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: var(--bg-soft);
+    color: var(--text-soft);
+    text-align: center;
+  }
+
+  .elemento {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-item);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  }
+
+  .elemento:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(32, 48, 64, 0.08);
+  }
+
+  .elemento.selezionato {
+    background: var(--bg-item-checked);
+    border-color: #f3c05a;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .nome-elemento {
+    overflow-wrap: anywhere;
+  }
+
+  .elemento.selezionato .nome-elemento {
+    color: #6d5727;
+    font-weight: 600;
+  }
+
+  .elemento-primario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .maniglia-elemento-drag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    min-height: 34px;
+    border-radius: 10px;
+    border: 1px dashed rgba(32, 48, 64, 0.18);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--text-soft);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: grab;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .maniglia-elemento-drag:active {
+    cursor: grabbing;
+  }
+
+  .elemento.trascinato {
+    opacity: 0.65;
+  }
+
+  .elemento.drag-over-before {
+    box-shadow: inset 0 4px 0 var(--primary);
+  }
+
+  .elemento.drag-over-after {
+    box-shadow: inset 0 -4px 0 var(--primary);
+  }
+
+  .input-testo {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--text-main);
+    font: inherit;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+
+  .input-testo:focus {
+    outline: none;
+    border-color: rgba(31, 111, 139, 0.9);
+    box-shadow: 0 0 0 4px rgba(31, 111, 139, 0.14);
+  }
+
+  .bottone {
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+  }
+
+  .bottone:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(32, 48, 64, 0.08);
+  }
+
+  .bottone:focus-visible {
+    outline: 3px solid rgba(31, 111, 139, 0.24);
+    outline-offset: 2px;
+  }
+
+  .bottone-primario {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .bottone-primario:hover {
+    background: var(--primary-hover);
+  }
+
+  .bottone-secondario {
+    background: #e6edf2;
+    color: var(--text-main);
+  }
+
+  .bottone-secondario:hover {
+    background: #d9e4eb;
+  }
+
+  .bottone-pericolo {
+    background: #f7dfdc;
+    color: var(--danger);
+  }
+
+  .bottone-pericolo:hover {
+    background: #efcbc6;
+    color: var(--danger-hover);
+  }
+
+  .bottone-icona {
+    min-width: 44px;
+    padding-inline: 12px;
+  }
+
+  .messaggio {
+    min-height: 24px;
+    margin: 14px 0 0;
+    color: var(--primary-hover);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .dialogo {
+    width: min(92vw, 420px);
+    border: 0;
+    border-radius: 22px;
+    padding: 0;
+    box-shadow: 0 28px 60px rgba(32, 48, 64, 0.28);
+  }
+
+  .dialogo::backdrop {
+    background: rgba(18, 28, 37, 0.45);
+    backdrop-filter: blur(3px);
+  }
+
+  .dialogo-contenuto {
+    padding: 22px;
+    background: #fff;
+  }
+
+  .dialogo h2 {
+    margin: 0 0 10px;
+    font-size: 1.25rem;
+  }
+
+  .dialogo p {
+    margin: 0 0 14px;
+    color: var(--text-soft);
+    line-height: 1.5;
+  }
+
+  .dialogo .input-testo {
+    margin-bottom: 14px;
+  }
+
+  .dialogo-azioni {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 720px) {
+    .pagina {
+      width: min(100% - 20px, 980px);
+      padding-top: 20px;
+    }
+
+    .crea-lista,
+    .aggiungi-elemento {
+      grid-template-columns: 1fr;
+    }
+
+    .lista-header {
+      flex-direction: column;
+    }
+
+    .lista-azioni {
+      width: 100%;
+    }
+
+    .lista-controlli {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .lista-azioni .bottone,
+    .azioni-secondarie .bottone {
+      flex: 1 1 auto;
+    }
+
+    .elemento {
+      align-items: start;
+    }
+
+    .dialogo-azioni .bottone {
+      flex: 1 1 auto;
+    }
+  }
 </style>
 </head>
-
 <body>
+  <main class="pagina">
+    <header class="intestazione">
+      <h1>Liste Fornitori</h1>
+      <p>Gestisci piu liste, spunta cio che hai gia controllato e tieni tutto salvato nel browser.</p>
+    </header>
 
-<h2>Liste Fornitori</h2>
+    <section class="crea-lista" aria-label="Crea una nuova lista">
+      <label class="sr-only" for="nomeLista">Nome della nuova lista</label>
+      <input
+        id="nomeLista"
+        class="input-testo"
+        type="text"
+        placeholder="Nome nuova lista"
+        autocomplete="off"
+        maxlength="80"
+      >
+      <button id="creaListaBtn" class="bottone bottone-primario" type="button">Crea lista</button>
+    </section>
 
-<input id="nomeLista" placeholder="Nuova lista" onkeydown="if(event.key==='Enter') aggiungiLista()">
-<button onclick="aggiungiLista()">Crea lista</button>
+    <p id="messaggioStato" class="messaggio" aria-live="polite"></p>
+    <section id="contenitore" class="griglia-liste" aria-live="polite"></section>
+  </main>
 
-<div id="contenitore"></div>
+  <dialog id="dialogoAzione" class="dialogo">
+    <form id="dialogoForm" class="dialogo-contenuto" method="dialog">
+      <h2 id="dialogoTitolo">Azione</h2>
+      <p id="dialogoTesto"></p>
+      <input
+        id="dialogoInput"
+        class="input-testo"
+        type="text"
+        autocomplete="off"
+        maxlength="120"
+        hidden
+      >
+      <div class="dialogo-azioni">
+        <button id="dialogoAnnulla" class="bottone bottone-secondario" type="button">Annulla</button>
+        <button id="dialogoConferma" class="bottone bottone-primario" type="submit">Conferma</button>
+      </div>
+    </form>
+  </dialog>
 
 <script>
-
-let liste = JSON.parse(localStorage.getItem("listeFornitori")) || [];
-
-function salva(){
-localStorage.setItem("listeFornitori", JSON.stringify(liste));
-}
-
-function render(){
-
-let contenitore=document.getElementById("contenitore");
-contenitore.innerHTML="";
-
-liste.forEach((lista,i)=>{
-
-let div=document.createElement("div");
-div.className="lista";
-
-div.innerHTML=`
-<h3>${lista.nome}</h3>
-
-<input id="input${i}" placeholder="Nuovo elemento" 
-onkeydown="if(event.key==='Enter') aggiungiElemento(${i})">
-
-<button onclick="aggiungiElemento(${i})">Aggiungi</button>
-
-<button onclick="ordina(${i})">Ordina A-Z</button>
-<button onclick="deselezionaTutto(${i})">Deseleziona tutto</button>
-<button onclick="modLista(${i})">Modifica</button>
-<button onclick="delLista(${i})">Elimina</button>
-
-<div id="elementi${i}"></div>
-`;
-
-contenitore.appendChild(div);
-
-let box=document.getElementById("elementi"+i);
-
-lista.elementi.forEach((el,j)=>{
-
-let riga=document.createElement("div");
-riga.className="elemento"+(el.check?" ordinare":"");
-
-riga.innerHTML=`
-
-<input type="checkbox" ${el.check?"checked":""} onclick="toggle(${i},${j})">
-
-<div class="nome">${el.nome}</div>
-
-<button onclick="modEl(${i},${j})">✏️</button>
-
-<button onclick="delEl(${i},${j})">🗑️</button>
-
-`;
-
-box.appendChild(riga);
-
-});
-
-});
-
-salva();
-
-}
-
-function aggiungiLista(){
-
-let nome=document.getElementById("nomeLista").value;
-
-if(!nome) return;
-
-liste.push({
-nome:nome,
-elementi:[]
-});
-
-document.getElementById("nomeLista").value="";
-
-render();
-
-}
-
-function delLista(i){
-
-if(confirm("Eliminare lista?")){
-liste.splice(i,1);
-render();
-}
-
-}
-
-function modLista(i){
-
-let nuovo=prompt("Nuovo nome",liste[i].nome);
-
-if(nuovo){
-liste[i].nome=nuovo;
-render();
-}
-
-}
-
-function aggiungiElemento(i){
-
-let input=document.getElementById("input"+i);
-
-if(!input.value) return;
-
-liste[i].elementi.push({
-nome:input.value,
-check:false
-});
-
-input.value="";
-
-render();
-
-}
-
-function toggle(i,j){
-
-liste[i].elementi[j].check=!liste[i].elementi[j].check;
-
-render();
-
-}
-
-function delEl(i,j){
-
-if(confirm("Eliminare elemento?")){
-liste[i].elementi.splice(j,1);
-render();
-}
-
-}
-
-function modEl(i,j){
-
-let nuovo=prompt("Modifica elemento",liste[i].elementi[j].nome);
-
-if(nuovo){
-liste[i].elementi[j].nome=nuovo;
-render();
-}
-
-}
-
-function ordina(i){
-
-liste[i].elementi.sort((a,b)=>a.nome.localeCompare(b.nome));
-
-render();
-
-}
-
-render();
-
-function deselezionaTutto(i){
-
-liste[i].elementi.forEach(el => {
-el.check = false
-})
-
-render()
-
-}
+  const STORAGE_KEY = "listeFornitori";
+  const COLORI_PREDEFINITI = ["#1f6f8b", "#d97706", "#2f855a", "#c05621", "#3b82f6", "#b45309"];
+
+  const stato = {
+    liste: caricaListe(),
+    dragIndice: null,
+    dragElemento: null
+  };
+
+  const nomeListaInput = document.getElementById("nomeLista");
+  const creaListaBtn = document.getElementById("creaListaBtn");
+  const contenitore = document.getElementById("contenitore");
+  const messaggioStato = document.getElementById("messaggioStato");
+  const dialogoAzione = document.getElementById("dialogoAzione");
+  const dialogoForm = document.getElementById("dialogoForm");
+  const dialogoTitolo = document.getElementById("dialogoTitolo");
+  const dialogoTesto = document.getElementById("dialogoTesto");
+  const dialogoInput = document.getElementById("dialogoInput");
+  const dialogoConferma = document.getElementById("dialogoConferma");
+  const dialogoAnnulla = document.getElementById("dialogoAnnulla");
+
+  creaListaBtn.addEventListener("click", aggiungiLista);
+  nomeListaInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      aggiungiLista();
+    }
+  });
+
+  function caricaListe() {
+    try {
+      const dati = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return Array.isArray(dati)
+        ? dati.map((lista, indice) => normalizzaLista(lista, indice)).filter(Boolean)
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function normalizzaLista(lista, indice) {
+    if (!lista || typeof lista.nome !== "string") {
+      return null;
+    }
+
+    const nome = lista.nome.trim();
+    if (!nome) {
+      return null;
+    }
+
+    const elementi = Array.isArray(lista.elementi)
+      ? lista.elementi
+          .map((elemento) => {
+            if (!elemento || typeof elemento.nome !== "string") {
+              return null;
+            }
+
+            const nomeElemento = elemento.nome.trim();
+            if (!nomeElemento) {
+              return null;
+            }
+
+            return {
+              nome: nomeElemento,
+              check: Boolean(elemento.check)
+            };
+          })
+          .filter(Boolean)
+      : [];
+
+    return {
+      nome,
+      colore: normalizzaColore(lista.colore, colorePredefinito(indice)),
+      elementi
+    };
+  }
+
+  function colorePredefinito(indice) {
+    return COLORI_PREDEFINITI[indice % COLORI_PREDEFINITI.length];
+  }
+
+  function normalizzaColore(colore, fallback = COLORI_PREDEFINITI[0]) {
+    if (typeof colore !== "string") {
+      return fallback;
+    }
+
+    const valore = colore.trim();
+    if (/^#[0-9a-f]{6}$/i.test(valore)) {
+      return valore.toLowerCase();
+    }
+
+    if (/^#[0-9a-f]{3}$/i.test(valore)) {
+      const [r, g, b] = valore.slice(1);
+      return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+    }
+
+    return fallback;
+  }
+
+  function hexToRgba(hex, alpha) {
+    const colore = normalizzaColore(hex);
+    const rosso = Number.parseInt(colore.slice(1, 3), 16);
+    const verde = Number.parseInt(colore.slice(3, 5), 16);
+    const blu = Number.parseInt(colore.slice(5, 7), 16);
+    return `rgba(${rosso}, ${verde}, ${blu}, ${alpha})`;
+  }
+
+  function applicaStileLista(elementoLista, colore) {
+    elementoLista.style.setProperty("--list-color", colore);
+    elementoLista.style.setProperty("--list-color-soft", hexToRgba(colore, 0.16));
+  }
+
+  function salva() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stato.liste));
+  }
+
+  function mostraMessaggio(testo = "") {
+    messaggioStato.textContent = testo;
+    if (!testo) {
+      return;
+    }
+
+    window.clearTimeout(mostraMessaggio.timeoutId);
+    mostraMessaggio.timeoutId = window.setTimeout(() => {
+      messaggioStato.textContent = "";
+    }, 2200);
+  }
+
+  function creaBottone(testo, classi, onClick, label) {
+    const bottone = document.createElement("button");
+    bottone.type = "button";
+    bottone.className = classi;
+    bottone.textContent = testo;
+    if (label) {
+      bottone.setAttribute("aria-label", label);
+      bottone.title = label;
+    }
+    bottone.addEventListener("click", onClick);
+    return bottone;
+  }
+
+  function apriDialogoConferma({ titolo, testo, confermaLabel = "Conferma", variante = "primario" }) {
+    return new Promise((resolve) => {
+      dialogoTitolo.textContent = titolo;
+      dialogoTesto.textContent = testo;
+      dialogoInput.hidden = true;
+      dialogoInput.value = "";
+      dialogoConferma.textContent = confermaLabel;
+      dialogoConferma.className = `bottone ${variante === "pericolo" ? "bottone-pericolo" : "bottone-primario"}`;
+
+      const chiudi = (esito) => {
+        dialogoForm.removeEventListener("submit", onSubmit);
+        dialogoAnnulla.removeEventListener("click", onCancel);
+        dialogoAzione.removeEventListener("cancel", onCancelDialog);
+        dialogoAzione.close();
+        resolve(esito);
+      };
+
+      const onSubmit = (event) => {
+        event.preventDefault();
+        chiudi(true);
+      };
+
+      const onCancel = () => chiudi(false);
+      const onCancelDialog = (event) => {
+        event.preventDefault();
+        chiudi(false);
+      };
+
+      dialogoForm.addEventListener("submit", onSubmit);
+      dialogoAnnulla.addEventListener("click", onCancel);
+      dialogoAzione.addEventListener("cancel", onCancelDialog);
+      dialogoAzione.showModal();
+    });
+  }
+
+  function apriDialogoTesto({
+    titolo,
+    testo,
+    valore = "",
+    placeholder = "",
+    confermaLabel = "Salva"
+  }) {
+    return new Promise((resolve) => {
+      dialogoTitolo.textContent = titolo;
+      dialogoTesto.textContent = testo;
+      dialogoInput.hidden = false;
+      dialogoInput.value = valore;
+      dialogoInput.placeholder = placeholder;
+      dialogoConferma.textContent = confermaLabel;
+      dialogoConferma.className = "bottone bottone-primario";
+
+      const chiudi = (esito) => {
+        dialogoForm.removeEventListener("submit", onSubmit);
+        dialogoAnnulla.removeEventListener("click", onCancel);
+        dialogoAzione.removeEventListener("cancel", onCancelDialog);
+        dialogoAzione.close();
+        resolve(esito);
+      };
+
+      const onSubmit = (event) => {
+        event.preventDefault();
+        chiudi(dialogoInput.value.trim());
+      };
+
+      const onCancel = () => chiudi(null);
+      const onCancelDialog = (event) => {
+        event.preventDefault();
+        chiudi(null);
+      };
+
+      dialogoForm.addEventListener("submit", onSubmit);
+      dialogoAnnulla.addEventListener("click", onCancel);
+      dialogoAzione.addEventListener("cancel", onCancelDialog);
+      dialogoAzione.showModal();
+      dialogoInput.focus();
+      dialogoInput.select();
+    });
+  }
+
+  function render() {
+    contenitore.replaceChildren();
+
+    if (stato.liste.length === 0) {
+      const vuoto = document.createElement("div");
+      vuoto.className = "liste-vuote";
+      vuoto.textContent = "Non ci sono ancora liste. Crea la prima per iniziare.";
+      contenitore.appendChild(vuoto);
+      return;
+    }
+
+    stato.liste.forEach((lista, indiceLista) => {
+      contenitore.appendChild(creaSchedaLista(lista, indiceLista));
+    });
+  }
+
+  function creaSchedaLista(lista, indiceLista) {
+    const sezione = document.createElement("section");
+    sezione.className = "lista";
+    sezione.dataset.index = String(indiceLista);
+    applicaStileLista(sezione, lista.colore);
+    sezione.addEventListener("dragover", (event) => gestisciDragOverLista(event, indiceLista));
+    sezione.addEventListener("drop", (event) => gestisciDropLista(event, indiceLista));
+
+    const header = document.createElement("div");
+    header.className = "lista-header";
+
+    const titoloBox = document.createElement("div");
+
+    const titolo = document.createElement("h2");
+    titolo.textContent = lista.nome;
+
+    const meta = document.createElement("p");
+    meta.className = "lista-meta";
+    meta.textContent = creaTestoMeta(lista);
+
+    titoloBox.append(titolo, meta);
+
+    const controlliLista = document.createElement("div");
+    controlliLista.className = "lista-controlli";
+
+    const selettoreColore = document.createElement("label");
+    selettoreColore.className = "controllo-colore";
+    selettoreColore.textContent = "Colore";
+
+    const inputColore = document.createElement("input");
+    inputColore.className = "input-colore";
+    inputColore.type = "color";
+    inputColore.value = lista.colore;
+    inputColore.setAttribute("aria-label", `Scegli il colore della lista ${lista.nome}`);
+    inputColore.addEventListener("change", () => aggiornaColoreLista(indiceLista, inputColore.value));
+
+    selettoreColore.appendChild(inputColore);
+
+    const manigliaDrag = document.createElement("span");
+    manigliaDrag.className = "maniglia-drag";
+    manigliaDrag.textContent = "≡";
+    manigliaDrag.draggable = true;
+    manigliaDrag.tabIndex = 0;
+    manigliaDrag.setAttribute("role", "button");
+    manigliaDrag.setAttribute("aria-label", `Trascina per riordinare la lista ${lista.nome}`);
+    manigliaDrag.title = "Trascina per riordinare";
+    manigliaDrag.addEventListener("dragstart", (event) => avviaTrascinamentoLista(event, indiceLista));
+    manigliaDrag.addEventListener("dragend", fineTrascinamentoLista);
+
+    controlliLista.append(selettoreColore, manigliaDrag);
+
+    const azioniLista = document.createElement("div");
+    azioniLista.className = "lista-azioni";
+    azioniLista.append(
+      creaBottone("Modifica", "bottone bottone-secondario", () => modLista(indiceLista)),
+      creaBottone("Elimina", "bottone bottone-pericolo", () => delLista(indiceLista))
+    );
+
+    const azioniHeader = document.createElement("div");
+    azioniHeader.className = "lista-azioni";
+    azioniHeader.append(controlliLista, azioniLista);
+
+    header.append(titoloBox, azioniHeader);
+
+    const contenuto = document.createElement("div");
+    contenuto.className = "lista-contenuto";
+
+    const aggiungiBox = document.createElement("div");
+    aggiungiBox.className = "aggiungi-elemento";
+
+    const inputElemento = document.createElement("input");
+    inputElemento.className = "input-testo";
+    inputElemento.type = "text";
+    inputElemento.placeholder = "Nuovo elemento";
+    inputElemento.autocomplete = "off";
+    inputElemento.maxLength = 120;
+    inputElemento.setAttribute("aria-label", `Nuovo elemento per la lista ${lista.nome}`);
+    inputElemento.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        aggiungiElemento(indiceLista, inputElemento);
+      }
+    });
+
+    const bottoneAggiungi = creaBottone(
+      "Aggiungi",
+      "bottone bottone-primario",
+      () => aggiungiElemento(indiceLista, inputElemento)
+    );
+
+    aggiungiBox.append(inputElemento, bottoneAggiungi);
+
+    const azioniSecondarie = document.createElement("div");
+    azioniSecondarie.className = "azioni-secondarie";
+    azioniSecondarie.append(
+      creaBottone("Ordina A-Z", "bottone bottone-secondario", () => ordina(indiceLista)),
+      creaBottone(
+        "Copia selezionati",
+        "bottone bottone-secondario",
+        () => copiaSelezionati(indiceLista)
+      ),
+      creaBottone(
+        "Deseleziona tutto",
+        "bottone bottone-secondario",
+        () => deselezionaTutto(indiceLista)
+      )
+    );
+
+    const listaElementi = document.createElement("div");
+    listaElementi.className = "lista-elementi";
+    listaElementi.addEventListener("dragover", (event) => gestisciDragOverContenitoreElementi(event, indiceLista));
+    listaElementi.addEventListener("drop", (event) => gestisciDropContenitoreElementi(event, indiceLista));
+
+    if (lista.elementi.length === 0) {
+      const vuoto = document.createElement("p");
+      vuoto.className = "messaggio-vuoto";
+      vuoto.textContent = "Questa lista e vuota. Aggiungi il primo elemento.";
+      listaElementi.appendChild(vuoto);
+    } else {
+      lista.elementi.forEach((elemento, indiceElemento) => {
+        listaElementi.appendChild(creaElemento(lista.nome, elemento, indiceLista, indiceElemento));
+      });
+    }
+
+    contenuto.append(aggiungiBox, azioniSecondarie, listaElementi);
+    sezione.append(header, contenuto);
+    return sezione;
+  }
+
+  function creaElemento(nomeLista, elemento, indiceLista, indiceElemento) {
+    const riga = document.createElement("div");
+    riga.className = `elemento${elemento.check ? " selezionato" : ""}`;
+    riga.addEventListener("dragover", (event) => gestisciDragOverElemento(event, indiceLista, indiceElemento));
+    riga.addEventListener("drop", (event) => gestisciDropElemento(event, indiceLista, indiceElemento));
+
+    const primario = document.createElement("div");
+    primario.className = "elemento-primario";
+
+    const manigliaDrag = document.createElement("span");
+    manigliaDrag.className = "maniglia-elemento-drag";
+    manigliaDrag.textContent = "⋮⋮";
+    manigliaDrag.draggable = true;
+    manigliaDrag.tabIndex = 0;
+    manigliaDrag.setAttribute("role", "button");
+    manigliaDrag.setAttribute("aria-label", `Trascina per riordinare ${elemento.nome}`);
+    manigliaDrag.title = "Trascina per riordinare";
+    manigliaDrag.addEventListener("dragstart", (event) =>
+      avviaTrascinamentoElemento(event, indiceLista, indiceElemento)
+    );
+    manigliaDrag.addEventListener("dragend", fineTrascinamentoElemento);
+
+    const label = document.createElement("label");
+    label.className = "checkbox-label";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = elemento.check;
+    checkbox.setAttribute(
+      "aria-label",
+      `${elemento.check ? "Deseleziona" : "Seleziona"} ${elemento.nome} nella lista ${nomeLista}`
+    );
+    checkbox.addEventListener("change", () => toggle(indiceLista, indiceElemento));
+
+    const nome = document.createElement("span");
+    nome.className = "nome-elemento";
+    nome.textContent = elemento.nome;
+
+    label.append(checkbox, nome);
+    primario.append(manigliaDrag, label);
+
+    const azioni = document.createElement("div");
+    azioni.className = "azioni-elemento";
+    azioni.append(
+      creaBottone(
+        "Modifica",
+        "bottone bottone-secondario bottone-icona",
+        () => modEl(indiceLista, indiceElemento),
+        `Modifica elemento ${elemento.nome}`
+      ),
+      creaBottone(
+        "Elimina",
+        "bottone bottone-pericolo bottone-icona",
+        () => delEl(indiceLista, indiceElemento),
+        `Elimina elemento ${elemento.nome}`
+      )
+    );
+
+    riga.append(primario, azioni);
+    return riga;
+  }
+
+  function creaTestoMeta(lista) {
+    const totale = lista.elementi.length;
+    const selezionati = lista.elementi.filter((elemento) => elemento.check).length;
+
+    if (totale === 0) {
+      return "Nessun elemento";
+    }
+
+    const parola = totale === 1 ? "elemento" : "elementi";
+    return `${totale} ${parola}, ${selezionati} selezionati`;
+  }
+
+  function esisteDuplicato(nome, indiceLista, indiceElementoDaIgnorare = -1) {
+    return stato.liste[indiceLista].elementi.some((elemento, indiceElemento) => {
+      if (indiceElemento === indiceElementoDaIgnorare) {
+        return false;
+      }
+      return elemento.nome.localeCompare(nome, "it", { sensitivity: "base" }) === 0;
+    });
+  }
+
+  function aggiungiLista() {
+    const nome = nomeListaInput.value.trim();
+    if (!nome) {
+      mostraMessaggio("Inserisci un nome valido per la lista.");
+      nomeListaInput.focus();
+      return;
+    }
+
+    stato.liste.push({
+      nome,
+      colore: colorePredefinito(stato.liste.length),
+      elementi: []
+    });
+
+    salva();
+    render();
+
+    nomeListaInput.value = "";
+    nomeListaInput.focus();
+    mostraMessaggio(`Lista "${nome}" creata.`);
+  }
+
+  function aggiornaColoreLista(indiceLista, colore) {
+    stato.liste[indiceLista].colore = normalizzaColore(colore, stato.liste[indiceLista].colore);
+    salva();
+    render();
+  }
+
+  function avviaTrascinamentoLista(event, indiceLista) {
+    stato.dragIndice = indiceLista;
+    const scheda = event.currentTarget.closest(".lista");
+    if (scheda) {
+      scheda.classList.add("trascinata");
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(indiceLista));
+  }
+
+  function gestisciDragOverLista(event, indiceLista) {
+    if (stato.dragIndice === null || stato.dragIndice === indiceLista) {
+      return;
+    }
+
+    event.preventDefault();
+    const sezione = event.currentTarget;
+    const rettangolo = sezione.getBoundingClientRect();
+    const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
+
+    contenitore.querySelectorAll(".lista").forEach((listaElemento) => {
+      listaElemento.classList.remove("drag-over-before", "drag-over-after");
+    });
+
+    sezione.classList.add(posizione === "before" ? "drag-over-before" : "drag-over-after");
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+  }
+
+  function gestisciDropLista(event, indiceLista) {
+    if (stato.dragIndice === null) {
+      return;
+    }
+
+    event.preventDefault();
+    const rettangolo = event.currentTarget.getBoundingClientRect();
+    const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
+    spostaLista(stato.dragIndice, indiceLista, posizione);
+  }
+
+  function spostaLista(indicePartenza, indiceDestinazione, posizione) {
+    if (indicePartenza === indiceDestinazione && posizione === "before") {
+      fineTrascinamentoLista();
+      return;
+    }
+
+    let indiceInserimento = posizione === "after" ? indiceDestinazione + 1 : indiceDestinazione;
+    const [listaSpostata] = stato.liste.splice(indicePartenza, 1);
+
+    if (!listaSpostata) {
+      fineTrascinamentoLista();
+      return;
+    }
+
+    if (indicePartenza < indiceInserimento) {
+      indiceInserimento -= 1;
+    }
+
+    stato.liste.splice(indiceInserimento, 0, listaSpostata);
+    salva();
+    render();
+    mostraMessaggio(`Lista "${listaSpostata.nome}" spostata.`);
+    stato.dragIndice = null;
+  }
+
+  function fineTrascinamentoLista() {
+    stato.dragIndice = null;
+    contenitore.querySelectorAll(".lista").forEach((listaElemento) => {
+      listaElemento.classList.remove("trascinata", "drag-over-before", "drag-over-after");
+    });
+  }
+
+  function avviaTrascinamentoElemento(event, indiceLista, indiceElemento) {
+    stato.dragElemento = { indiceLista, indiceElemento };
+    const riga = event.currentTarget.closest(".elemento");
+    if (riga) {
+      riga.classList.add("trascinato");
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", `${indiceLista}:${indiceElemento}`);
+  }
+
+  function gestisciDragOverElemento(event, indiceLista, indiceElemento) {
+    if (!stato.dragElemento || stato.dragElemento.indiceLista !== indiceLista) {
+      return;
+    }
+
+    event.preventDefault();
+    const riga = event.currentTarget;
+    const rettangolo = riga.getBoundingClientRect();
+    const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
+
+    pulisciIndicatoriElementi();
+    riga.classList.add(posizione === "before" ? "drag-over-before" : "drag-over-after");
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+  }
+
+  function gestisciDropElemento(event, indiceLista, indiceElemento) {
+    if (!stato.dragElemento || stato.dragElemento.indiceLista !== indiceLista) {
+      return;
+    }
+
+    event.preventDefault();
+    const riga = event.currentTarget;
+    const rettangolo = riga.getBoundingClientRect();
+    const posizione = event.clientY < rettangolo.top + rettangolo.height / 2 ? "before" : "after";
+    spostaElemento(indiceLista, stato.dragElemento.indiceElemento, indiceElemento, posizione);
+  }
+
+  function gestisciDragOverContenitoreElementi(event, indiceLista) {
+    if (!stato.dragElemento || stato.dragElemento.indiceLista !== indiceLista) {
+      return;
+    }
+
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = "move";
+    }
+  }
+
+  function gestisciDropContenitoreElementi(event, indiceLista) {
+    if (!stato.dragElemento || stato.dragElemento.indiceLista !== indiceLista) {
+      return;
+    }
+
+    if (event.target.closest(".elemento")) {
+      return;
+    }
+
+    event.preventDefault();
+    spostaElemento(indiceLista, stato.dragElemento.indiceElemento, stato.liste[indiceLista].elementi.length - 1, "after");
+  }
+
+  function spostaElemento(indiceLista, indicePartenza, indiceDestinazione, posizione) {
+    const elementi = stato.liste[indiceLista].elementi;
+    if (!Array.isArray(elementi) || elementi.length <= 1) {
+      fineTrascinamentoElemento();
+      return;
+    }
+
+    if (indicePartenza === indiceDestinazione && posizione === "before") {
+      fineTrascinamentoElemento();
+      return;
+    }
+
+    let indiceInserimento = posizione === "after" ? indiceDestinazione + 1 : indiceDestinazione;
+    const [elementoSpostato] = elementi.splice(indicePartenza, 1);
+
+    if (!elementoSpostato) {
+      fineTrascinamentoElemento();
+      return;
+    }
+
+    if (indicePartenza < indiceInserimento) {
+      indiceInserimento -= 1;
+    }
+
+    elementi.splice(indiceInserimento, 0, elementoSpostato);
+    salva();
+    render();
+    mostraMessaggio(`Elemento "${elementoSpostato.nome}" spostato.`);
+    stato.dragElemento = null;
+  }
+
+  function pulisciIndicatoriElementi() {
+    contenitore.querySelectorAll(".elemento").forEach((elemento) => {
+      elemento.classList.remove("trascinato", "drag-over-before", "drag-over-after");
+    });
+  }
+
+  function fineTrascinamentoElemento() {
+    stato.dragElemento = null;
+    pulisciIndicatoriElementi();
+  }
+
+  async function delLista(indiceLista) {
+    const nomeLista = stato.liste[indiceLista].nome;
+    const confermato = await apriDialogoConferma({
+      titolo: "Elimina lista",
+      testo: `Vuoi eliminare la lista "${nomeLista}"?`,
+      confermaLabel: "Elimina",
+      variante: "pericolo"
+    });
+
+    if (!confermato) {
+      return;
+    }
+
+    stato.liste.splice(indiceLista, 1);
+    salva();
+    render();
+    mostraMessaggio(`Lista "${nomeLista}" eliminata.`);
+  }
+
+  async function modLista(indiceLista) {
+    const nomeAttuale = stato.liste[indiceLista].nome;
+    const nuovoNome = await apriDialogoTesto({
+      titolo: "Modifica lista",
+      testo: "Inserisci il nuovo nome della lista.",
+      valore: nomeAttuale,
+      placeholder: "Nome lista",
+      confermaLabel: "Salva"
+    });
+
+    if (nuovoNome === null) {
+      return;
+    }
+
+    if (!nuovoNome) {
+      mostraMessaggio("Il nome della lista non puo essere vuoto.");
+      return;
+    }
+
+    stato.liste[indiceLista].nome = nuovoNome;
+    salva();
+    render();
+    mostraMessaggio("Nome lista aggiornato.");
+  }
+
+  function aggiungiElemento(indiceLista, inputElemento) {
+    const nome = inputElemento.value.trim();
+    if (!nome) {
+      mostraMessaggio("Inserisci un nome valido per l'elemento.");
+      inputElemento.focus();
+      return;
+    }
+
+    if (esisteDuplicato(nome, indiceLista)) {
+      mostraMessaggio("Questo elemento esiste gia nella lista.");
+      inputElemento.focus();
+      inputElemento.select();
+      return;
+    }
+
+    stato.liste[indiceLista].elementi.push({
+      nome,
+      check: false
+    });
+
+    salva();
+    render();
+    mostraMessaggio(`Elemento "${nome}" aggiunto.`);
+
+    const schede = contenitore.querySelectorAll(".lista");
+    const inputAggiornato = schede[indiceLista]?.querySelector(".input-testo");
+    if (inputAggiornato) {
+      inputAggiornato.focus();
+    }
+  }
+
+  function toggle(indiceLista, indiceElemento) {
+    const elemento = stato.liste[indiceLista].elementi[indiceElemento];
+    elemento.check = !elemento.check;
+    salva();
+    render();
+  }
+
+  async function delEl(indiceLista, indiceElemento) {
+    const nomeElemento = stato.liste[indiceLista].elementi[indiceElemento].nome;
+    const confermato = await apriDialogoConferma({
+      titolo: "Elimina elemento",
+      testo: `Vuoi eliminare l'elemento "${nomeElemento}"?`,
+      confermaLabel: "Elimina",
+      variante: "pericolo"
+    });
+
+    if (!confermato) {
+      return;
+    }
+
+    stato.liste[indiceLista].elementi.splice(indiceElemento, 1);
+    salva();
+    render();
+    mostraMessaggio(`Elemento "${nomeElemento}" eliminato.`);
+  }
+
+  async function modEl(indiceLista, indiceElemento) {
+    const nomeAttuale = stato.liste[indiceLista].elementi[indiceElemento].nome;
+    const nuovoNome = await apriDialogoTesto({
+      titolo: "Modifica elemento",
+      testo: "Aggiorna il nome dell'elemento.",
+      valore: nomeAttuale,
+      placeholder: "Nome elemento",
+      confermaLabel: "Salva"
+    });
+
+    if (nuovoNome === null) {
+      return;
+    }
+
+    if (!nuovoNome) {
+      mostraMessaggio("Il nome dell'elemento non puo essere vuoto.");
+      return;
+    }
+
+    if (esisteDuplicato(nuovoNome, indiceLista, indiceElemento)) {
+      mostraMessaggio("Esiste gia un elemento con questo nome nella lista.");
+      return;
+    }
+
+    stato.liste[indiceLista].elementi[indiceElemento].nome = nuovoNome;
+    salva();
+    render();
+    mostraMessaggio("Elemento aggiornato.");
+  }
+
+  function ordina(indiceLista) {
+    stato.liste[indiceLista].elementi.sort((a, b) =>
+      a.nome.localeCompare(b.nome, "it", { sensitivity: "base" })
+    );
+    salva();
+    render();
+    mostraMessaggio("Elementi ordinati da A a Z.");
+  }
+
+  async function copiaSelezionati(indiceLista) {
+    const elementiSelezionati = stato.liste[indiceLista].elementi
+      .filter((elemento) => elemento.check)
+      .map((elemento) => elemento.nome);
+
+    if (elementiSelezionati.length === 0) {
+      mostraMessaggio("Seleziona almeno un elemento da copiare.");
+      return;
+    }
+
+    const testo = elementiSelezionati.join("\n");
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(testo);
+      } else {
+        const areaTemporanea = document.createElement("textarea");
+        areaTemporanea.value = testo;
+        areaTemporanea.setAttribute("readonly", "");
+        areaTemporanea.style.position = "absolute";
+        areaTemporanea.style.left = "-9999px";
+        document.body.appendChild(areaTemporanea);
+        areaTemporanea.select();
+        document.execCommand("copy");
+        document.body.removeChild(areaTemporanea);
+      }
+
+      mostraMessaggio(`${elementiSelezionati.length} elementi copiati negli appunti.`);
+    } catch {
+      mostraMessaggio("Non sono riuscito a copiare gli elementi.");
+    }
+  }
+
+  function deselezionaTutto(indiceLista) {
+    const elementi = stato.liste[indiceLista].elementi;
+    if (elementi.length === 0) {
+      mostraMessaggio("Non ci sono elementi da deselezionare.");
+      return;
+    }
+
+    elementi.forEach((elemento) => {
+      elemento.check = false;
+    });
+
+    salva();
+    render();
+    mostraMessaggio("Tutte le selezioni sono state rimosse.");
+  }
+
+  render();
 </script>
-
 </body>
 </html>
